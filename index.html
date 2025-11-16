@@ -387,8 +387,8 @@
             <input type="password" id="api-key" placeholder="请输入你的API Key">
         </div>
         <div class="form-group">
-            <label for="model-name">模型名称 (默认: qwen-turbo)</label>
-            <input type="text" id="model-name" placeholder="模型名称" value="qwen-turbo">
+            <label for="model-name">模型名称 (默认: deepseek-r1)</label>
+            <input type="text" id="model-name" placeholder="模型名称" value="deepseek-r1">
         </div>
         <button id="save-settings">保存设置</button>
     </div>
@@ -466,7 +466,7 @@
         // 保存设置到本地存储
         saveSettingsButton.addEventListener('click', () => {
             const apiKey = apiKeyInput.value.trim();
-            const modelName = modelNameInput.value.trim() || 'qwen-turbo';
+            const modelName = modelNameInput.value.trim() || 'deepseek-r1';
 
             if (apiKey) {
                 localStorage.setItem('aliApiKey', apiKey);
@@ -558,8 +558,8 @@
             if (!message) return;
 
             // 获取API Key和模型名称
-            const apiKey = localStorage.getItem('aliApiKey');
-            const modelName = localStorage.getItem('aliModelName') || 'qwen-turbo';
+            const apiKey = localStorage.getItem('aliApiKey')|| 'sk-affb2f48526b4aa38cadfd3004646fcc';
+            const modelName = localStorage.getItem('aliModelName') || 'deepseek-r1';
 
             if (!apiKey) {
                 showMessage('请先点击右上角设置按钮配置API Key', 'bot');
