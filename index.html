@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>海上安全预警大模型</title>
+    <!-- 引入Markdown解析库和代码高亮库 -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js/lib/highlight.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js/styles/github.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #e6f2ff;
+            background-image:
+                radial-gradient(circle at 10% 20%, rgba(12, 116, 231, 0.05) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(12, 116, 231, 0.05) 0%, transparent 20%);
+            color: #333;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .header {
+            background-color: #0a5cad;
+            color: white;
+            padding: 1rem 2rem;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 48, 96, 0.2);
+            position: relative;
+        }
+
+        .header h1 {
+            font-weight: 600;
+            font-size: 1.8rem;
+            letter-spacing: 0.5px;
+        }
+
+        .settings-toggle {
+            position: absolute;
+            right: 1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .settings-toggle:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .chat-container {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .message {
+            margin-bottom: 2rem;
+            max-width: 80%;
+            display: flex;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .user-message {
+            margin-left: auto;
+            flex-direction: row-reverse;
+        }
+
+        .bot-message {
+            margin-right: auto;
+        }
+
+        .avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            margin: 0 10px;
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .message-content {
+            padding: 1rem 1.2rem;
+            border-radius: 18px;
+            word-wrap: break-word;
+            line-height: 1.6;
+            position: relative;
+            max-width: calc(100% - 62px);
+        }
+
+        .user-message .message-content {
+            background-color: #0a5cad;
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .bot-message .message-content {
+            background-color: white;
+            border: 1px solid #d0e4f7;
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 2px 8px rgba(10, 92, 173, 0.08);
+        }
+
+        /* Markdown样式 */
+        .message-content h1,
+        .message-content h2,
+        .message-content h3 {
+            margin: 1rem 0 0.5rem;
+            line-height: 1.3;
+        }
+
+        .message-content h1 {
+            font-size: 1.5rem;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 0.3rem;
+        }
+
+        .message-content h2 {
+            font-size: 1.3rem;
+        }
+
+        .message-content h3 {
+            font-size: 1.1rem;
+        }
+
+        .message-content p {
+            margin-bottom: 0.8rem;
+        }
+
+        .message-content ul,
+        .message-content ol {
+            margin: 0.8rem 0;
+            padding-left: 1.5rem;
+        }
+
+        .message-content li {
+            margin-bottom: 0.3rem;
+        }
+
+        .message-content code {
+            background-color: rgba(27, 31, 35, 0.05);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+
+        .message-content pre {
+            background-color: rgba(27, 31, 35, 0.09);
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 0.8rem 0;
+        }
+
+        .message-content pre code {
+            background: none;
+            padding: 0;
+            font-size: 0.85rem;
+        }
+
+        .message-content blockquote {
+            border-left: 4px solid #0a5cad;
+            padding-left: 1rem;
+            margin: 0.8rem 0;
+            color: #666;
+        }
+
+        .message-content a {
+            color: #0a5cad;
+            text-decoration: none;
+        }
+
+        .message-content a:hover {
+            text-decoration: underline;
+        }
+
+        .input-area {
+            display: flex;
+            padding: 1rem 2rem;
+            background-color: white;
+            border-top: 1px solid #d0e4f7;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            box-shadow: 0 -2px 10px rgba(0, 48, 96, 0.05);
+        }
+
+        #user-input {
+            flex: 1;
+            padding: 0.9rem 1.2rem;
+            border: 1px solid #b9d4f1;
+            border-radius: 24px;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s;
+            resize: none;
+            height: 50px;
+            max-height: 120px;
+            overflow-y: auto;
+        }
+
+        #user-input:focus {
+            border-color: #0a5cad;
+            box-shadow: 0 0 0 3px rgba(10, 92, 173, 0.1);
+        }
+
+        #send-button {
+            margin-left: 1rem;
+            padding: 0 1.5rem;
+            background-color: #0a5cad;
+            color: white;
+            border: none;
+            border-radius: 24px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #send-button:hover {
+            background-color: #084a8a;
+            transform: translateY(-1px);
+        }
+
+        #send-button:active {
+            transform: translateY(1px);
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .settings {
+            position: fixed;
+            top: 5.5rem;
+            right: 1rem;
+            background-color: white;
+            padding: 1.2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 48, 96, 0.15);
+            z-index: 100;
+            width: 300px;
+            transition: all 0.3s ease;
+            transform: translateX(calc(100% + 1rem));
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .settings.active {
+            transform: translateX(0);
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .settings h3 {
+            color: #0a5cad;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            border-bottom: 1px solid #f0f5fa;
+            padding-bottom: 0.5rem;
+        }
+
+        .settings .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .settings label {
+            display: block;
+            margin-bottom: 0.4rem;
+            color: #335c80;
+            font-size: 0.9rem;
+        }
+
+        .settings input {
+            width: 100%;
+            padding: 0.6rem 0.8rem;
+            border: 1px solid #b9d4f1;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            transition: border-color 0.3s;
+        }
+
+        .settings input:focus {
+            border-color: #0a5cad;
+            outline: none;
+        }
+
+        .settings button {
+            width: 100%;
+            padding: 0.6rem 1rem;
+            background-color: #0a5cad;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-weight: 500;
+            margin-top: 0.5rem;
+        }
+
+        .settings button:hover {
+            background-color: #084a8a;
+        }
+
+        @media (max-width: 768px) {
+            .chat-container {
+                padding: 1rem;
+            }
+
+            .message {
+                max-width: 90%;
+            }
+
+            .settings {
+                width: calc(100% - 2rem);
+                left: 1rem;
+                right: 1rem;
+                top: 5rem;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>海上安全预警大模型</h1>
+        <button class="settings-toggle" id="settings-toggle">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M19.14 12.94C19.18 12.64 19.2 12.33 19.2 12C19.2 11.68 19.18 11.36 19.13 11.06L21.16 9.48C21.34 9.34 21.39 9.07 21.28 8.87L19.36 5.55C19.24 5.33 18.99 5.26 18.77 5.33L16.38 6.29C15.88 5.91 15.35 5.59 14.76 5.35L14.4 2.81C14.36 2.57 14.16 2.4 13.92 2.4H10.08C9.84 2.4 9.65 2.57 9.61 2.81L9.25 5.35C8.66 5.59 8.12 5.92 7.63 6.29L5.24 5.33C5.02 5.25 4.77 5.33 4.65 5.55L2.74 8.87C2.62 9.08 2.66 9.34 2.86 9.48L4.89 11.06C4.84 11.36 4.8 11.69 4.8 12C4.8 12.31 4.82 12.64 4.87 12.94L2.84 14.52C2.66 14.66 2.61 14.93 2.72 15.13L4.64 18.45C4.76 18.67 5.01 18.74 5.23 18.67L7.62 17.71C8.12 18.09 8.65 18.41 9.24 18.65L9.6 21.19C9.65 21.43 9.84 21.6 10.08 21.6H13.92C14.16 21.6 14.35 21.43 14.39 21.19L14.75 18.65C15.34 18.41 15.88 18.09 16.37 17.71L18.76 18.67C18.98 18.75 19.23 18.67 19.35 18.45L21.27 15.13C21.39 14.91 21.34 14.66 21.14 14.52L19.14 12.94ZM12 15.6C10.02 15.6 8.4 13.98 8.4 12C8.4 10.02 10.02 8.4 12 8.4C13.98 8.4 15.6 10.02 15.6 12C15.6 13.98 13.98 15.6 12 15.6Z" fill="currentColor"/>
+            </svg>
+        </button>
+    </div>
+
+    <div class="settings" id="settings-panel">
+        <h3>系统设置</h3>
+        <div class="form-group">
+            <label for="api-key">阿里云百炼 API Key</label>
+            <input type="password" id="api-key" placeholder="请输入你的API Key">
+        </div>
+        <div class="form-group">
+            <label for="model-name">模型名称 (默认: qwen-turbo)</label>
+            <input type="text" id="model-name" placeholder="模型名称" value="qwen-turbo">
+        </div>
+        <button id="save-settings">保存设置</button>
+    </div>
+
+    <div class="chat-container" id="chat-container">
+        <div class="message bot-message">
+            <div class="avatar">
+                <img src="./asset/LOGO.png" alt="系统头像">
+            </div>
+            <div class="message-content">
+                你好！我是海上安全预警大模型。欢迎开始咨询海上安全相关问题。
+            </div>
+        </div>
+    </div>
+
+    <div class="input-area">
+        <textarea id="user-input" placeholder="请输入关于海上安全的问题..."></textarea>
+        <button id="send-button">发送</button>
+    </div>
+
+    <script>
+        // 初始化代码高亮
+        document.addEventListener('DOMContentLoaded', () => {
+            // 配置marked解析器
+            marked.setOptions({
+                highlight: function(code, lang) {
+                    if (lang && hljs.getLanguage(lang)) {
+                        return hljs.highlight(code, { language: lang }).value;
+                    }
+                    return hljs.highlightAuto(code).value;
+                },
+                breaks: true, // 支持换行
+                gfm: true     // 支持GitHub Flavored Markdown
+            });
+        });
+
+        // DOM元素
+        const chatContainer = document.getElementById('chat-container');
+        const userInput = document.getElementById('user-input');
+        const sendButton = document.getElementById('send-button');
+        const apiKeyInput = document.getElementById('api-key');
+        const modelNameInput = document.getElementById('model-name');
+        const saveSettingsButton = document.getElementById('save-settings');
+        const settingsToggle = document.getElementById('settings-toggle');
+        const settingsPanel = document.getElementById('settings-panel');
+
+        // 切换设置面板显示/隐藏
+        settingsToggle.addEventListener('click', () => {
+            settingsPanel.classList.toggle('active');
+        });
+
+        // 点击外部关闭设置面板
+        document.addEventListener('click', (e) => {
+            if (!settingsPanel.contains(e.target) &&
+                e.target !== settingsToggle &&
+                !settingsToggle.contains(e.target)) {
+                settingsPanel.classList.remove('active');
+            }
+        });
+
+        // 从本地存储加载设置
+        function loadSettings() {
+            const apiKey = localStorage.getItem('aliApiKey');
+            const modelName = localStorage.getItem('aliModelName');
+
+            if (apiKey) {
+                apiKeyInput.value = apiKey;
+            }
+
+            if (modelName) {
+                modelNameInput.value = modelName;
+            }
+        }
+
+        // 保存设置到本地存储
+        saveSettingsButton.addEventListener('click', () => {
+            const apiKey = apiKeyInput.value.trim();
+            const modelName = modelNameInput.value.trim() || 'qwen-turbo';
+
+            if (apiKey) {
+                localStorage.setItem('aliApiKey', apiKey);
+                localStorage.setItem('aliModelName', modelName);
+                showMessage('设置已保存，可以开始咨询海上安全问题了！', 'bot');
+                settingsPanel.classList.remove('active'); // 保存后关闭面板
+            } else {
+                showMessage('请输入有效的API Key', 'bot');
+            }
+        });
+
+        // 显示消息（支持Markdown解析）
+        function showMessage(text, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}-message`;
+
+            // 创建头像
+            const avatarDiv = document.createElement('div');
+            avatarDiv.className = 'avatar';
+            const avatarImg = document.createElement('img');
+
+            if (sender === 'user') {
+                avatarImg.src = 'https://picsum.photos/id/1005/200/200'; // 用户头像
+                avatarImg.alt = '用户头像';
+            } else {
+                avatarImg.src = './asset/LOGO.png'; // 系统头像
+                avatarImg.alt = '系统头像';
+            }
+
+            avatarDiv.appendChild(avatarImg);
+
+            // 创建消息内容（解析Markdown）
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+
+            // 对系统消息进行Markdown解析，用户消息保持原样
+            if (sender === 'bot') {
+                contentDiv.innerHTML = marked.parse(text);
+                // 对解析后的代码块应用高亮
+                contentDiv.querySelectorAll('pre code').forEach((block) => {
+                    hljs.highlightElement(block);
+                });
+            } else {
+                contentDiv.textContent = text;
+            }
+
+            messageDiv.appendChild(avatarDiv);
+            messageDiv.appendChild(contentDiv);
+            chatContainer.appendChild(messageDiv);
+
+            // 滚动到底部
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+
+            return messageDiv;
+        }
+
+        // 显示加载状态
+        function showLoading() {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message bot-message';
+
+            // 头像
+            const avatarDiv = document.createElement('div');
+            avatarDiv.className = 'avatar';
+            const avatarImg = document.createElement('img');
+            avatarImg.src = './asset/LOGO.png';
+            avatarImg.alt = '系统头像';
+            avatarDiv.appendChild(avatarImg);
+
+            // 加载内容
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'loading';
+            contentDiv.appendChild(loadingDiv);
+
+            messageDiv.appendChild(avatarDiv);
+            messageDiv.appendChild(contentDiv);
+            chatContainer.appendChild(messageDiv);
+
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+
+            return messageDiv;
+        }
+
+        // 发送消息
+        async function sendMessage() {
+            const message = userInput.value.trim();
+            if (!message) return;
+
+            // 获取API Key和模型名称
+            const apiKey = localStorage.getItem('aliApiKey');
+            const modelName = localStorage.getItem('aliModelName') || 'qwen-turbo';
+
+            if (!apiKey) {
+                showMessage('请先点击右上角设置按钮配置API Key', 'bot');
+                return;
+            }
+
+            // 显示用户消息
+            showMessage(message, 'user');
+            userInput.value = '';
+            // 重置输入框高度
+            userInput.style.height = '50px';
+
+            // 显示加载状态
+            const loadingMessage = showLoading();
+
+            try {
+                // 调用后端API
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message,
+                        apiKey,
+                        modelName
+                    })
+                });
+
+                // 移除加载状态
+                loadingMessage.remove();
+
+                if (!response.ok) {
+                    throw new Error('请求失败: ' + response.statusText);
+                }
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage(data.result, 'bot');
+                } else {
+                    showMessage('错误: ' + (data.error || '未知错误'), 'bot');
+                }
+            } catch (error) {
+                // 移除加载状态
+                loadingMessage.remove();
+                showMessage('发生错误: ' + error.message, 'bot');
+                console.error('发送消息失败:', error);
+            }
+        }
+
+        // 调整输入框高度
+        userInput.addEventListener('input', () => {
+            // 重置高度以正确计算滚动高度
+            userInput.style.height = 'auto';
+            // 设置新高度（最小50px，最大120px）
+            const newHeight = Math.min(userInput.scrollHeight, 120);
+            userInput.style.height = newHeight + 'px';
+        });
+
+        // 事件监听
+        sendButton.addEventListener('click', sendMessage);
+
+        userInput.addEventListener('keypress', (e) => {
+            // 按Enter发送，Shift+Enter换行
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        // 初始加载设置
+        loadSettings();
+    </script>
+</body>
+</html>
