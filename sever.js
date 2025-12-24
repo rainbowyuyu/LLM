@@ -12,10 +12,10 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '.')));
 
-// 阿里云百炼API调用
+// 调用
 app.post('/api/chat', async (req, res) => {
     try {
-        const { message, apiKey, modelName = 'qwen-turbo' } = req.body;
+        const { message, apiKey, modelName = 'deepseek-r1' } = req.body;
 
         if (!message || !apiKey) {
             return res.status(400).json({

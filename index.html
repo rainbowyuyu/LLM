@@ -28,6 +28,127 @@
             overflow: hidden;
         }
 
+        .app-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .history-sidebar {
+            width: 280px;
+            background-color: white;
+            border-right: 1px solid #d0e4f7;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease;
+            z-index: 10;
+        }
+
+        .sidebar-header {
+            padding: 1rem;
+            border-bottom: 1px solid #f0f5fa;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.2rem;
+            color: #0a5cad;
+            font-weight: 600;
+        }
+
+        .new-chat-btn {
+            background-color: #0a5cad;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .new-chat-btn:hover {
+            background-color: #084a8a;
+        }
+
+        .history-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0.5rem;
+        }
+
+        .history-item {
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            position: relative;
+        }
+
+        .history-item:hover {
+            background-color: #f0f5fa;
+        }
+
+        .history-item.active {
+            background-color: #e6f2ff;
+            border-left: 3px solid #0a5cad;
+        }
+
+        .history-title {
+            font-size: 0.9rem;
+            color: #333;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 0.3rem;
+        }
+
+        .history-time {
+            font-size: 0.75rem;
+            color: #999;
+        }
+
+        .delete-history {
+            position: absolute;
+            right: 0.5rem;
+            top: 0.5rem;
+            color: #999;
+            background: none;
+            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 14px;
+            opacity: 0;
+            transition: all 0.2s;
+        }
+
+        .history-item:hover .delete-history {
+            opacity: 1;
+        }
+
+        .delete-history:hover {
+            background-color: #ffeeee;
+            color: #ff4d4f;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
         .header {
             background-color: #0a5cad;
             color: white;
@@ -134,6 +255,32 @@
             box-shadow: 0 2px 8px rgba(10, 92, 173, 0.08);
         }
 
+        /* 媒体内容样式 */
+        .message-media {
+            margin: 0.8rem 0;
+            border-radius: 8px;
+            overflow: hidden;
+            max-width: 100%;
+        }
+
+        .message-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .message-image:hover {
+            transform: scale(1.02);
+        }
+
+        .message-video {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+
         /* Markdown样式 */
         .message-content h1,
         .message-content h2,
@@ -217,6 +364,36 @@
             margin: 0 auto;
             width: 100%;
             box-shadow: 0 -2px 10px rgba(0, 48, 96, 0.05);
+        }
+
+        .input-tools {
+            display: flex;
+            margin-right: 0.5rem;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+
+        .tool-button {
+            background: none;
+            border: none;
+            color: #0a5cad;
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 5px;
+            transition: all 0.2s;
+        }
+
+        .tool-button:hover {
+            background-color: #f0f5fa;
+        }
+
+        .tool-button input {
+            display: none;
         }
 
         #user-input {
@@ -348,7 +525,297 @@
             background-color: #084a8a;
         }
 
+        /* 媒体预览容器 */
+        .media-preview {
+            margin-bottom: 0.8rem;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+            max-width: 100%;
+        }
+
+        .media-preview img, .media-preview video {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .remove-media {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+
+        .remove-media:hover {
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+
+        /* 全屏预览 */
+        .fullscreen-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .fullscreen-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .fullscreen-content {
+            max-width: 90%;
+            max-height: 90%;
+            position: relative;
+        }
+
+        .fullscreen-content img, .fullscreen-content video {
+            max-width: 100%;
+            max-height: 80vh;
+        }
+
+        .close-fullscreen {
+            position: absolute;
+            top: -40px;
+            right: 0;
+            color: white;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        /* 媒体上传按钮容器 */
+        .media-upload-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        /* 合并的媒体上传按钮 */
+        .media-upload-button {
+            background: none;
+            border: none;
+            color: #0a5cad;
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .media-upload-button .dropdown-arrow {
+            font-size: 8px;
+            margin-left: 2px;
+            transition: transform 0.2s;
+        }
+
+        .media-upload-button:hover {
+            background-color: #f0f5fa;
+        }
+
+        .media-upload-button.active .dropdown-arrow {
+            transform: rotate(180deg);
+        }
+
+        /* 上传选项下拉菜单 */
+        .media-upload-options {
+            position: absolute;
+            bottom: 100%;
+            left: 0;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 0.5rem 0;
+            min-width: 120px;
+            z-index: 100;
+            display: none;
+        }
+
+        .media-upload-options.show {
+            display: block;
+        }
+
+        /* 上传选项样式 */
+        .upload-option {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: #333;
+        }
+
+        .upload-option:hover {
+            background-color: #f0f5fa;
+        }
+
+        .upload-option .option-icon {
+            margin-right: 0.5rem;
+            font-size: 1rem;
+        }
+
+        /* 紧凑的媒体预览容器 */
+        #media-previews-container {
+            display: flex;
+            gap: 0.5rem;
+            padding: 0.2rem 0;
+            overflow-x: auto;
+            max-width: 200px;
+            margin: 0;
+        }
+
+        /* 小型媒体预览样式 */
+        .media-preview {
+            width: 60px;
+            height: 60px;
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+            flex-shrink: 0;
+            background-color: #f5f8fa;
+        }
+
+        .media-preview img,
+        .media-preview video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* 删除按钮样式优化 */
+        .remove-media {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background-color: #ff4d4f;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+        /* 输入框优化 - 占满剩余宽度 */
+        #user-input {
+            flex: 1;
+            padding: 0.9rem 1.2rem;
+            border: 1px solid #b9d4f1;
+            border-radius: 24px;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s;
+            resize: none;
+            height: 50px;
+            max-height: 120px;
+            overflow-y: auto;
+            min-width: 0; /* 解决flex布局下宽度溢出问题 */
+        }
+
+        #user-input:focus {
+            border-color: #0a5cad;
+            box-shadow: 0 0 0 3px rgba(10, 92, 173, 0.1);
+        }
+
+        /* 发送按钮样式 */
+        #send-button {
+            padding: 0 1.5rem;
+            background-color: #0a5cad;
+            color: white;
+            border: none;
+            border-radius: 24px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 50px;
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+
+        #send-button:hover {
+            background-color: #084a8a;
+            transform: translateY(-1px);
+        }
+
+        #send-button:active {
+            transform: translateY(1px);
+        }
+
+        /* 移动端菜单按钮 */
+        .menu-toggle {
+            display: none;
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 100;
+        }
+
         @media (max-width: 768px) {
+            .app-container {
+                position: relative;
+            }
+
+            .history-sidebar {
+                position: absolute;
+                left: 0;
+                top: 0;
+                bottom: 0;
+                transform: translateX(-100%);
+                width: 80%;
+                max-width: 280px;
+            }
+
+            .history-sidebar.active {
+                transform: translateX(0);
+            }
+
+            .menu-toggle {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
             .chat-container {
                 padding: 1rem;
             }
@@ -366,50 +833,128 @@
 
             .header h1 {
                 font-size: 1.5rem;
+                padding-left: 2rem;
+            }
+
+            .input-area {
+                padding: 0.8rem 1rem;
+                gap: 0.5rem;
+            }
+
+            #media-previews-container {
+                max-width: 150px;
+            }
+
+            .media-preview {
+                width: 50px;
+                height: 50px;
+            }
+
+            #send-button {
+                padding: 0 1rem;
+                font-size: 0.9rem;
             }
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>海上安全预警大模型</h1>
-        <button class="settings-toggle" id="settings-toggle">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M19.14 12.94C19.18 12.64 19.2 12.33 19.2 12C19.2 11.68 19.18 11.36 19.13 11.06L21.16 9.48C21.34 9.34 21.39 9.07 21.28 8.87L19.36 5.55C19.24 5.33 18.99 5.26 18.77 5.33L16.38 6.29C15.88 5.91 15.35 5.59 14.76 5.35L14.4 2.81C14.36 2.57 14.16 2.4 13.92 2.4H10.08C9.84 2.4 9.65 2.57 9.61 2.81L9.25 5.35C8.66 5.59 8.12 5.92 7.63 6.29L5.24 5.33C5.02 5.25 4.77 5.33 4.65 5.55L2.74 8.87C2.62 9.08 2.66 9.34 2.86 9.48L4.89 11.06C4.84 11.36 4.8 11.69 4.8 12C4.8 12.31 4.82 12.64 4.87 12.94L2.84 14.52C2.66 14.66 2.61 14.93 2.72 15.13L4.64 18.45C4.76 18.67 5.01 18.74 5.23 18.67L7.62 17.71C8.12 18.09 8.65 18.41 9.24 18.65L9.6 21.19C9.65 21.43 9.84 21.6 10.08 21.6H13.92C14.16 21.6 14.35 21.43 14.39 21.19L14.75 18.65C15.34 18.41 15.88 18.09 16.37 17.71L18.76 18.67C18.98 18.75 19.23 18.67 19.35 18.45L21.27 15.13C21.39 14.91 21.34 14.66 21.14 14.52L19.14 12.94ZM12 15.6C10.02 15.6 8.4 13.98 8.4 12C8.4 10.02 10.02 8.4 12 8.4C13.98 8.4 15.6 10.02 15.6 12C15.6 13.98 13.98 15.6 12 15.6Z" fill="currentColor"/>
-            </svg>
-        </button>
-    </div>
-
-    <div class="settings" id="settings-panel">
-        <h3>系统设置</h3>
-        <div class="form-group">
-            <label for="api-key">阿里云百炼 API Key</label>
-            <input type="password" id="api-key" placeholder="请输入你的API Key">
-        </div>
-        <div class="form-group">
-            <label for="model-name">模型名称 (默认: deepseek-r1)</label>
-            <input type="text" id="model-name" placeholder="模型名称" value="deepseek-r1">
-        </div>
-        <button id="save-settings">保存设置</button>
-    </div>
-
-    <div class="chat-container" id="chat-container">
-        <div class="message bot-message">
-            <div class="avatar">
-                <img src="./asset/LOGO.png" alt="系统头像">
+    <div class="app-container">
+        <!-- 历史聊天导航栏 -->
+        <div class="history-sidebar" id="history-sidebar">
+            <div class="sidebar-header">
+                <h2>历史会话</h2>
+                <button class="new-chat-btn" id="new-chat-btn">+</button>
             </div>
-            <div class="message-content">
-                你好！我是海上安全预警大模型。欢迎开始咨询海上安全相关问题。
+            <div class="history-list" id="history-list">
+                <!-- 历史会话项将通过JS动态添加 -->
             </div>
         </div>
+
+        <!-- 主内容区域 -->
+        <div class="main-content">
+            <div class="header">
+                <button class="menu-toggle" id="menu-toggle">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3 18H21V16H3V18ZM3 13H21V11H3V13ZM3 6V8H21V6H3Z" fill="currentColor"/>
+                    </svg>
+                </button>
+                <h1>海上安全预警大模型</h1>
+                <button class="settings-toggle" id="settings-toggle">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M19.14 12.94C19.18 12.64 19.2 12.33 19.2 12C19.2 11.68 19.18 11.36 19.13 11.06L21.16 9.48C21.34 9.34 21.39 9.07 21.28 8.87L19.36 5.55C19.24 5.33 18.99 5.26 18.77 5.33L16.38 6.29C15.88 5.91 15.35 5.59 14.76 5.35L14.4 2.81C14.36 2.57 14.16 2.4 13.92 2.4H10.08C9.84 2.4 9.65 2.57 9.61 2.81L9.25 5.35C8.66 5.59 8.12 5.92 7.63 6.29L5.24 5.33C5.02 5.25 4.77 5.33 4.65 5.55L2.74 8.87C2.62 9.08 2.66 9.34 2.86 9.48L4.89 11.06C4.84 11.36 4.8 11.69 4.8 12C4.8 12.31 4.82 12.64 4.87 12.94L2.84 14.52C2.66 14.66 2.61 14.93 2.72 15.13L4.64 18.45C4.76 18.67 5.01 18.74 5.23 18.67L7.62 17.71C8.12 18.09 8.65 18.41 9.24 18.65L9.6 21.19C9.65 21.43 9.84 21.6 10.08 21.6H13.92C14.16 21.6 14.35 21.43 14.39 21.19L14.75 18.65C15.34 18.41 15.88 18.09 16.37 17.71L18.76 18.67C18.98 18.75 19.23 18.67 19.35 18.45L21.27 15.13C21.39 14.91 21.34 14.66 21.14 14.52L19.14 12.94ZM12 15.6C10.02 15.6 8.4 13.98 8.4 12C8.4 10.02 10.02 8.4 12 8.4C13.98 8.4 15.6 10.02 15.6 12C15.6 13.98 13.98 15.6 12 15.6Z" fill="currentColor"/>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="settings" id="settings-panel">
+                <h3>系统设置</h3>
+                <div class="form-group">
+                    <label for="api-key">API Key</label>
+                    <input type="password" id="api-key" placeholder="请输入你的API Key">
+                </div>
+                <div class="form-group">
+                    <label for="model-name">模型名称 (默认: deepseek-r1)</label>
+                    <input type="text" id="model-name" placeholder="模型名称" value="deepseek-r1">
+                </div>
+                <button id="save-settings">保存设置</button>
+            </div>
+
+            <div class="chat-container" id="chat-container">
+                <div class="message bot-message">
+                    <div class="avatar">
+                        <img src="./asset/LOGO.png" alt="系统头像">
+                    </div>
+                    <div class="message-content">
+                        你好！我是海上安全预警大模型。欢迎开始咨询海上安全相关问题。你可以上传图片或视频获取分析。
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-area">
+                <!-- 合并的媒体上传按钮 -->
+                <div class="media-upload-container">
+                    <button class="tool-button media-upload-button" id="media-upload-button" title="上传媒体文件">
+                        📎<span class="dropdown-arrow">▼</span>
+                        <!-- 下拉箭头 -->
+                    </button>
+                    <!-- 上传选项下拉菜单 -->
+                    <div class="media-upload-options" id="media-upload-options">
+                        <label class="upload-option">
+                            <input type="file" id="image-upload" accept="image/*" hidden>
+                            <span class="option-icon">🖼️</span> 上传图片
+                        </label>
+                        <label class="upload-option">
+                            <input type="file" id="video-upload" accept="video/*" hidden>
+                            <span class="option-icon">🎬</span> 上传视频
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 紧凑的媒体预览容器 -->
+                <div id="media-previews-container"></div>
+
+                <!-- 优化宽度的输入框 -->
+                <textarea id="user-input" placeholder="请输入关于海上安全的问题..."></textarea>
+
+                <button id="send-button">发送</button>
+            </div>
+        </div>
     </div>
 
-    <div class="input-area">
-        <textarea id="user-input" placeholder="请输入关于海上安全的问题..."></textarea>
-        <button id="send-button">发送</button>
+    <!-- 全屏预览容器 -->
+    <div class="fullscreen-overlay" id="fullscreen-overlay">
+        <div class="fullscreen-content" id="fullscreen-content">
+            <button class="close-fullscreen" id="close-fullscreen">&times;</button>
+        </div>
     </div>
 
     <script>
+        // 存储聊天会话数据
+        let chatSessions = [];
+        let currentSessionId = null;
+        // 存储当前上传的媒体文件
+        let uploadedMedia = [];
+
         // 初始化代码高亮
         document.addEventListener('DOMContentLoaded', () => {
             // 配置marked解析器
@@ -423,31 +968,305 @@
                 breaks: true, // 支持换行
                 gfm: true     // 支持GitHub Flavored Markdown
             });
+
+            // 加载本地存储的会话
+            loadChatSessions();
+            // 加载设置
+            loadSettings();
+            // 初始化事件监听
+            initEventListeners();
         });
 
-        // DOM元素
-        const chatContainer = document.getElementById('chat-container');
-        const userInput = document.getElementById('user-input');
-        const sendButton = document.getElementById('send-button');
-        const apiKeyInput = document.getElementById('api-key');
-        const modelNameInput = document.getElementById('model-name');
-        const saveSettingsButton = document.getElementById('save-settings');
-        const settingsToggle = document.getElementById('settings-toggle');
-        const settingsPanel = document.getElementById('settings-panel');
+        // 初始化事件监听
+        function initEventListeners() {
+            // DOM元素
+            const chatContainer = document.getElementById('chat-container');
+            const userInput = document.getElementById('user-input');
+            const sendButton = document.getElementById('send-button');
+            const apiKeyInput = document.getElementById('api-key');
+            const modelNameInput = document.getElementById('model-name');
+            const saveSettingsButton = document.getElementById('save-settings');
+            const settingsToggle = document.getElementById('settings-toggle');
+            const settingsPanel = document.getElementById('settings-panel');
+            const imageUpload = document.getElementById('image-upload');
+            const videoUpload = document.getElementById('video-upload');
+            const mediaUploadButton = document.getElementById('media-upload-button');
+            const mediaUploadOptions = document.getElementById('media-upload-options');
+            const mediaPreviewsContainer = document.getElementById('media-previews-container');
+            const fullscreenOverlay = document.getElementById('fullscreen-overlay');
+            const fullscreenContent = document.getElementById('fullscreen-content');
+            const closeFullscreen = document.getElementById('close-fullscreen');
+            const newChatBtn = document.getElementById('new-chat-btn');
+            const historyList = document.getElementById('history-list');
+            const menuToggle = document.getElementById('menu-toggle');
+            const historySidebar = document.getElementById('history-sidebar');
 
-        // 切换设置面板显示/隐藏
-        settingsToggle.addEventListener('click', () => {
-            settingsPanel.classList.toggle('active');
-        });
+            // 切换设置面板显示/隐藏
+            settingsToggle.addEventListener('click', () => {
+                settingsPanel.classList.toggle('active');
+            });
 
-        // 点击外部关闭设置面板
-        document.addEventListener('click', (e) => {
-            if (!settingsPanel.contains(e.target) &&
-                e.target !== settingsToggle &&
-                !settingsToggle.contains(e.target)) {
-                settingsPanel.classList.remove('active');
+            // 移动端菜单切换
+            menuToggle.addEventListener('click', () => {
+                historySidebar.classList.toggle('active');
+            });
+
+            // 点击外部关闭设置面板
+            document.addEventListener('click', (e) => {
+                if (!settingsPanel.contains(e.target) &&
+                    e.target !== settingsToggle &&
+                    !settingsToggle.contains(e.target)) {
+                    settingsPanel.classList.remove('active');
+                }
+            });
+
+            // 媒体上传按钮交互逻辑
+            mediaUploadButton.addEventListener('click', (e) => {
+                e.stopPropagation();
+                mediaUploadOptions.classList.toggle('show');
+                mediaUploadButton.classList.toggle('active');
+            });
+
+            // 点击外部关闭下拉菜单
+            document.addEventListener('click', () => {
+                mediaUploadOptions.classList.remove('show');
+                mediaUploadButton.classList.remove('active');
+            });
+
+            // 阻止下拉菜单内部点击事件冒泡
+            mediaUploadOptions.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+
+            // 图片上传选择
+            imageUpload.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    handleMediaUpload(file, 'image');
+                }
+                imageUpload.value = ''; // 重置选择
+                mediaUploadOptions.classList.remove('show');
+                mediaUploadButton.classList.remove('active');
+            });
+
+            // 视频上传选择
+            videoUpload.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    handleMediaUpload(file, 'video');
+                }
+                videoUpload.value = ''; // 重置选择
+                mediaUploadOptions.classList.remove('show');
+                mediaUploadButton.classList.remove('active');
+            });
+
+            // 处理图片上传
+            imageUpload.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    handleMediaUpload(file, 'image');
+                }
+                // 重置input值，允许重复上传同一文件
+                imageUpload.value = '';
+            });
+
+            // 处理视频上传
+            videoUpload.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    handleMediaUpload(file, 'video');
+                }
+                // 重置input值，允许重复上传同一文件
+                videoUpload.value = '';
+            });
+
+            // 发送按钮点击事件
+            sendButton.addEventListener('click', sendMessage);
+
+            // 按Enter发送消息，Shift+Enter换行
+            userInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+
+            // 保存设置
+            saveSettingsButton.addEventListener('click', () => {
+                const apiKey = apiKeyInput.value.trim();
+                const modelName = modelNameInput.value.trim() || 'deepseek-r1';
+
+                if (apiKey) {
+                    localStorage.setItem('aliApiKey', apiKey);
+                    localStorage.setItem('aliModelName', modelName);
+                    showMessage('设置已保存，可以开始咨询海上安全问题了！', 'bot');
+                    settingsPanel.classList.remove('active'); // 保存后关闭面板
+                } else {
+                    showMessage('请输入有效的API Key', 'bot');
+                }
+            });
+
+            // 关闭全屏预览
+            closeFullscreen.addEventListener('click', closeFullscreenPreview);
+
+            // 点击全屏背景关闭预览
+            fullscreenOverlay.addEventListener('click', (e) => {
+                if (e.target === fullscreenOverlay) {
+                    closeFullscreenPreview();
+                }
+            });
+
+            // 按ESC键关闭全屏预览
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && fullscreenOverlay.classList.contains('active')) {
+                    closeFullscreenPreview();
+                }
+            });
+
+            // 新建聊天按钮
+            newChatBtn.addEventListener('click', createNewSession);
+        }
+
+        // 加载聊天会话
+        function loadChatSessions() {
+            const savedSessions = localStorage.getItem('chatSessions');
+            if (savedSessions) {
+                chatSessions = JSON.parse(savedSessions);
+                renderHistoryList();
+
+                // 如果有会话，加载最后一个会话
+                if (chatSessions.length > 0) {
+                    switchSession(chatSessions[0].id);
+                } else {
+                    // 否则创建新会话
+                    createNewSession();
+                }
+            } else {
+                // 没有会话，创建新会话
+                createNewSession();
             }
-        });
+        }
+
+        // 保存聊天会话到本地存储
+        function saveChatSessions() {
+            localStorage.setItem('chatSessions', JSON.stringify(chatSessions));
+            renderHistoryList();
+        }
+
+        // 创建新会话
+        function createNewSession() {
+            const newSession = {
+                id: Date.now().toString(),
+                title: '新会话',
+                createdAt: new Date().toISOString(),
+                messages: [
+                    {
+                        sender: 'bot',
+                        content: '你好！我是海上安全预警大模型。欢迎开始咨询海上安全相关问题。你可以上传图片或视频获取分析。',
+                        media: [],
+                        timestamp: new Date().toISOString()
+                    }
+                ]
+            };
+
+            chatSessions.unshift(newSession);
+            // 限制会话数量为20个
+            if (chatSessions.length > 20) {
+                chatSessions.pop();
+            }
+
+            switchSession(newSession.id);
+            saveChatSessions();
+
+            // 移动端自动隐藏侧边栏
+            if (window.innerWidth <= 768) {
+                document.getElementById('history-sidebar').classList.remove('active');
+            }
+        }
+
+        // 切换会话
+        function switchSession(sessionId) {
+            currentSessionId = sessionId;
+            const session = chatSessions.find(s => s.id === sessionId);
+
+            if (session) {
+                // 清空聊天容器
+                const chatContainer = document.getElementById('chat-container');
+                chatContainer.innerHTML = '';
+
+                // 渲染会话消息
+                session.messages.forEach(msg => {
+                    showMessage(msg.content, msg.sender, msg.media, false);
+                });
+
+                // 滚动到底部
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+
+                // 更新历史列表选中状态
+                renderHistoryList();
+            }
+
+            // 清空当前上传的媒体
+            clearMediaPreviews();
+        }
+
+        // 删除会话
+        function deleteSession(sessionId) {
+            if (currentSessionId === sessionId) {
+                // 如果删除当前会话，切换到第一个会话或创建新会话
+                const index = chatSessions.findIndex(s => s.id === sessionId);
+                chatSessions.splice(index, 1);
+
+                if (chatSessions.length > 0) {
+                    switchSession(chatSessions[0].id);
+                } else {
+                    createNewSession();
+                }
+            } else {
+                // 否则直接删除
+                chatSessions = chatSessions.filter(s => s.id !== sessionId);
+            }
+
+            saveChatSessions();
+        }
+
+        // 渲染历史会话列表
+        function renderHistoryList() {
+            const historyList = document.getElementById('history-list');
+            historyList.innerHTML = '';
+
+            chatSessions.forEach(session => {
+                const historyItem = document.createElement('div');
+                historyItem.className = `history-item ${session.id === currentSessionId ? 'active' : ''}`;
+                historyItem.dataset.sessionId = session.id;
+
+                // 格式化时间
+                const date = new Date(session.createdAt);
+                const timeStr = `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+
+                historyItem.innerHTML = `
+                    <div class="history-title">${session.title}</div>
+                    <div class="history-time">${timeStr}</div>
+                    <button class="delete-history" data-session-id="${session.id}">&times;</button>
+                `;
+
+                // 点击切换会话
+                historyItem.addEventListener('click', (e) => {
+                    if (!e.target.classList.contains('delete-history')) {
+                        switchSession(session.id);
+                    }
+                });
+
+                // 删除会话
+                const deleteBtn = historyItem.querySelector('.delete-history');
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    deleteSession(session.id);
+                });
+
+                historyList.appendChild(historyItem);
+            });
+        }
 
         // 从本地存储加载设置
         function loadSettings() {
@@ -455,31 +1274,117 @@
             const modelName = localStorage.getItem('aliModelName');
 
             if (apiKey) {
-                apiKeyInput.value = apiKey;
+                document.getElementById('api-key').value = apiKey;
             }
 
             if (modelName) {
-                modelNameInput.value = modelName;
+                document.getElementById('model-name').value = modelName;
             }
         }
 
-        // 保存设置到本地存储
-        saveSettingsButton.addEventListener('click', () => {
-            const apiKey = apiKeyInput.value.trim();
-            const modelName = modelNameInput.value.trim() || 'deepseek-r1';
+        // 发送消息
+        // 修改sendMessage函数，添加实际API请求功能
+        function sendMessage() {
+            const userInput = document.getElementById('user-input');
+            const messageText = userInput.value.trim();
 
-            if (apiKey) {
-                localStorage.setItem('aliApiKey', apiKey);
-                localStorage.setItem('aliModelName', modelName);
-                showMessage('设置已保存，可以开始咨询海上安全问题了！', 'bot');
-                settingsPanel.classList.remove('active'); // 保存后关闭面板
-            } else {
-                showMessage('请输入有效的API Key', 'bot');
+            // 检查是否有消息内容或上传的媒体
+            if (!messageText && uploadedMedia.length === 0) {
+                return;
             }
-        });
 
-        // 显示消息（支持Markdown解析）
-        function showMessage(text, sender) {
+            // 获取当前会话
+            const currentSession = chatSessions.find(s => s.id === currentSessionId);
+            if (!currentSession) return;
+
+            // 添加用户消息到会话
+            const userMessage = {
+                sender: 'user',
+                content: messageText,
+                media: uploadedMedia.map(media => ({
+                    id: media.id,
+                    type: media.type,
+                    url: media.url,
+                    name: media.file.name
+                })),
+                timestamp: new Date().toISOString()
+            };
+            currentSession.messages.push(userMessage);
+
+            // 显示用户消息
+            showMessage(messageText, 'user', userMessage.media);
+
+            // 更新会话标题
+            if (currentSession.title === '新会话' && messageText) {
+                currentSession.title = messageText.length > 20 ? messageText.substring(0, 20) + '...' : messageText;
+            }
+
+            // 清空输入和媒体
+            userInput.value = '';
+            clearMediaPreviews();
+            adjustInputAreaHeight();
+
+            // 显示加载状态
+            const loadingMessage = showMessage('', 'bot', [], true);
+
+            // 准备发送给API的数据
+            const apiData = {
+                message: messageText,
+                media: uploadedMedia.map(media => ({
+                    type: media.type,
+                    name: media.file.name,
+                    // 实际项目中可能需要转换为Blob或File对象
+                    content: media.url.split(',')[1] // 提取base64内容
+                }))
+            };
+
+            // 发送请求到后端API（修正版）
+            fetch('/api/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                    // ❌ 不再在前端传 Authorization
+                },
+                body: JSON.stringify({
+                    model: localStorage.getItem('aliModelName') || 'deepseek-r1',
+                    ...apiData
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                // 移除加载状态
+                loadingMessage.remove();
+
+                // 显示AI回复
+                showMessage(data.content, 'bot');
+
+                // 保存到会话
+                currentSession.messages.push({
+                    sender: 'bot',
+                    content: data.content,
+                    media: data.media || [],
+                    timestamp: new Date().toISOString()
+                });
+
+                // 保存会话
+                saveChatSessions();
+            })
+            .catch(error => {
+                loadingMessage.remove();
+                showMessage(`抱歉，请求失败: ${error.message}`, 'bot');
+                console.error('API请求错误:', error);
+            });
+
+        }
+
+        // 显示消息（支持Markdown解析和媒体显示）
+        function showMessage(content, sender, media = [], isLoading = false) {
+            const chatContainer = document.getElementById('chat-container');
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${sender}-message`;
 
@@ -498,19 +1403,55 @@
 
             avatarDiv.appendChild(avatarImg);
 
-            // 创建消息内容（解析Markdown）
+            // 创建消息内容容器
             const contentDiv = document.createElement('div');
             contentDiv.className = 'message-content';
 
-            // 对系统消息进行Markdown解析，用户消息保持原样
-            if (sender === 'bot') {
-                contentDiv.innerHTML = marked.parse(text);
-                // 对解析后的代码块应用高亮
-                contentDiv.querySelectorAll('pre code').forEach((block) => {
-                    hljs.highlightElement(block);
-                });
-            } else {
-                contentDiv.textContent = text;
+            // 添加媒体内容
+            media.forEach(item => {
+                const mediaContainer = document.createElement('div');
+                mediaContainer.className = 'message-media';
+
+                if (item.type === 'image') {
+                    const img = document.createElement('img');
+                    img.src = item.url;
+                    img.className = 'message-image';
+                    img.alt = '图片';
+                    img.addEventListener('click', () => {
+                        openFullscreenPreview(item.url, 'image');
+                    });
+                    mediaContainer.appendChild(img);
+                } else if (item.type === 'video') {
+                    const video = document.createElement('video');
+                    video.src = item.url;
+                    video.className = 'message-video';
+                    video.controls = true;
+                    video.addEventListener('click', (e) => {
+                        if (e.target === video) {
+                            openFullscreenPreview(item.url, 'video');
+                        }
+                    });
+                    mediaContainer.appendChild(video);
+                }
+
+                contentDiv.appendChild(mediaContainer);
+            });
+
+            // 添加文本内容或加载状态
+            if (isLoading) {
+                contentDiv.innerHTML += '<div class="loading"></div>';
+            } else if (content && content.trim()) {
+                if (sender === 'bot') {
+                    contentDiv.innerHTML += marked.parse(content);
+                    // 对解析后的代码块应用高亮
+                    contentDiv.querySelectorAll('pre code').forEach((block) => {
+                        hljs.highlightElement(block);
+                    });
+                } else {
+                    const textDiv = document.createElement('p');
+                    textDiv.textContent = content;
+                    contentDiv.appendChild(textDiv);
+                }
             }
 
             messageDiv.appendChild(avatarDiv);
@@ -523,116 +1464,135 @@
             return messageDiv;
         }
 
-        // 显示加载状态
-        function showLoading() {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = 'message bot-message';
-
-            // 头像
-            const avatarDiv = document.createElement('div');
-            avatarDiv.className = 'avatar';
-            const avatarImg = document.createElement('img');
-            avatarImg.src = './asset/LOGO.png';
-            avatarImg.alt = '系统头像';
-            avatarDiv.appendChild(avatarImg);
-
-            // 加载内容
-            const contentDiv = document.createElement('div');
-            contentDiv.className = 'message-content';
-            const loadingDiv = document.createElement('div');
-            loadingDiv.className = 'loading';
-            contentDiv.appendChild(loadingDiv);
-
-            messageDiv.appendChild(avatarDiv);
-            messageDiv.appendChild(contentDiv);
-            chatContainer.appendChild(messageDiv);
-
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-
-            return messageDiv;
-        }
-
-        // 发送消息
-        async function sendMessage() {
-            const message = userInput.value.trim();
-            if (!message) return;
-
-            // 获取API Key和模型名称
-            const apiKey = localStorage.getItem('aliApiKey');
-            const modelName = localStorage.getItem('aliModelName') || 'deepseek-r1';
-
-            if (!apiKey) {
-                showMessage('请先点击右上角设置按钮配置API Key', 'bot');
+        // 处理媒体上传
+        function handleMediaUpload(file, type) {
+            // 检查文件大小 (20MB以内)
+            if (file.size > 20 * 1024 * 1024) {
+                showMessage('文件大小不能超过20MB', 'bot');
                 return;
             }
 
-            // 显示用户消息
-            showMessage(message, 'user');
-            userInput.value = '';
-            // 重置输入框高度
-            userInput.style.height = '50px';
-
-            // 显示加载状态
-            const loadingMessage = showLoading();
-
-            try {
-                // 调用后端API
-                const response = await fetch('/api/chat', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        message,
-                        apiKey,
-                        modelName
-                    })
+            // 创建文件读取器
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                // 存储媒体信息
+                const mediaId = Date.now().toString();
+                uploadedMedia.push({
+                    id: mediaId,
+                    file: file,
+                    type: type,
+                    url: e.target.result
                 });
 
-                // 移除加载状态
-                loadingMessage.remove();
+                // 创建预览
+                createMediaPreview(mediaId, type, e.target.result);
 
-                if (!response.ok) {
-                    throw new Error('请求失败: ' + response.statusText);
-                }
+                // 调整输入框高度
+                adjustInputAreaHeight();
+            };
 
-                const data = await response.json();
-
-                if (data.success) {
-                    showMessage(data.result, 'bot');
-                } else {
-                    showMessage('错误: ' + (data.error || '未知错误'), 'bot');
-                }
-            } catch (error) {
-                // 移除加载状态
-                loadingMessage.remove();
-                showMessage('发生错误: ' + error.message, 'bot');
-                console.error('发送消息失败:', error);
+            if (type === 'image') {
+                reader.readAsDataURL(file);
+            } else {
+                reader.readAsDataURL(file);
             }
         }
 
-        // 调整输入框高度
-        userInput.addEventListener('input', () => {
-            // 重置高度以正确计算滚动高度
-            userInput.style.height = 'auto';
-            // 设置新高度（最小50px，最大120px）
-            const newHeight = Math.min(userInput.scrollHeight, 120);
-            userInput.style.height = newHeight + 'px';
-        });
+        // 创建媒体预览
+        function createMediaPreview(mediaId, type, url) {
+            const mediaPreviewsContainer = document.getElementById('media-previews-container');
+            const previewDiv = document.createElement('div');
+            previewDiv.className = 'media-preview';
+            previewDiv.dataset.mediaId = mediaId;
 
-        // 事件监听
-        sendButton.addEventListener('click', sendMessage);
-
-        userInput.addEventListener('keypress', (e) => {
-            // 按Enter发送，Shift+Enter换行
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                sendMessage();
+            if (type === 'image') {
+                const img = document.createElement('img');
+                img.src = url;
+                img.className = 'message-image';
+                img.alt = '预览图';
+                previewDiv.appendChild(img);
+            } else if (type === 'video') {
+                const video = document.createElement('video');
+                video.src = url;
+                video.className = 'message-video';
+                video.controls = true;
+                video.preload = 'metadata';
+                previewDiv.appendChild(video);
             }
-        });
 
-        // 初始加载设置
-        loadSettings();
+            // 添加删除按钮
+            const removeButton = document.createElement('button');
+            removeButton.className = 'remove-media';
+            removeButton.innerHTML = '&times;';
+            removeButton.addEventListener('click', (e) => {
+                e.stopPropagation();
+                // 从数组中移除
+                uploadedMedia = uploadedMedia.filter(media => media.id !== mediaId);
+                // 从DOM中移除
+                previewDiv.remove();
+                // 调整输入框高度
+                adjustInputAreaHeight();
+            });
+
+            previewDiv.appendChild(removeButton);
+
+            // 添加点击全屏预览事件
+            previewDiv.addEventListener('click', (e) => {
+                if (e.target !== removeButton) {
+                    openFullscreenPreview(url, type);
+                }
+            });
+
+            mediaPreviewsContainer.appendChild(previewDiv);
+        }
+
+        // 清空媒体预览
+        function clearMediaPreviews() {
+            const mediaPreviewsContainer = document.getElementById('media-previews-container');
+            mediaPreviewsContainer.innerHTML = '';
+            uploadedMedia = [];
+        }
+
+        // 打开全屏预览
+        function openFullscreenPreview(url, type) {
+            const fullscreenContent = document.getElementById('fullscreen-content');
+            fullscreenContent.innerHTML = '';
+
+            // 添加关闭按钮
+            const closeBtn = document.createElement('button');
+            closeBtn.className = 'close-fullscreen';
+            closeBtn.innerHTML = '&times;';
+            closeBtn.addEventListener('click', closeFullscreenPreview);
+            fullscreenContent.appendChild(closeBtn);
+
+            if (type === 'image') {
+                const img = document.createElement('img');
+                img.src = url;
+                fullscreenContent.appendChild(img);
+            } else if (type === 'video') {
+                const video = document.createElement('video');
+                video.src = url;
+                video.controls = true;
+                video.style.maxHeight = '80vh';
+                fullscreenContent.appendChild(video);
+            }
+
+            document.getElementById('fullscreen-overlay').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // 关闭全屏预览
+        function closeFullscreenPreview() {
+            document.getElementById('fullscreen-overlay').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // 调整输入框高度
+        function adjustInputAreaHeight() {
+            const userInput = document.getElementById('user-input');
+            userInput.style.height = 'auto';
+            userInput.style.height = Math.min(userInput.scrollHeight, 120) + 'px';
+        }
     </script>
 </body>
 </html>
