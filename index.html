@@ -1,124 +1,113 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>海上安全预警大模型</title>
-    <!-- 引入Markdown解析库和代码高亮库 -->
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/highlight.js/lib/highlight.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js/styles/github.min.css">
-    <link rel="stylesheet" href="styles.css">
-    <script src="script.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>海上安全预警系统</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="styles/main.css">
+  <link rel="icon" href="asset/LOGO.png" type="image/png">
 </head>
 <body>
-    <div class="app-container">
-        <!-- 历史聊天导航栏 -->
-        <div class="history-sidebar" id="history-sidebar">
-            <div class="sidebar-header">
-                <h2>历史会话</h2>
-                <button class="new-chat-btn" id="new-chat-btn">+</button>
-            </div>
-            <div class="history-list" id="history-list">
-                <!-- 历史会话项将通过JS动态添加 -->
-            </div>
-        </div>
-
-        <!-- 主内容区域 -->
-        <div class="main-content">
-            <div class="header">
-                <button class="menu-toggle" id="menu-toggle">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M3 18H21V16H3V18ZM3 13H21V11H3V13ZM3 6V8H21V6H3Z" fill="currentColor"/>
-                    </svg>
-                </button>
-                <h1>海上安全预警大模型</h1>
-                <button class="settings-toggle" id="settings-toggle">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M19.14 12.94C19.18 12.64 19.2 12.33 19.2 12C19.2 11.68 19.18 11.36 19.13 11.06L21.16 9.48C21.34 9.34 21.39 9.07 21.28 8.87L19.36 5.55C19.24 5.33 18.99 5.26 18.77 5.33L16.38 6.29C15.88 5.91 15.35 5.59 14.76 5.35L14.4 2.81C14.36 2.57 14.16 2.4 13.92 2.4H10.08C9.84 2.4 9.65 2.57 9.61 2.81L9.25 5.35C8.66 5.59 8.12 5.92 7.63 6.29L5.24 5.33C5.02 5.25 4.77 5.33 4.65 5.55L2.74 8.87C2.62 9.08 2.66 9.34 2.86 9.48L4.89 11.06C4.84 11.36 4.8 11.69 4.8 12C4.8 12.31 4.82 12.64 4.87 12.94L2.84 14.52C2.66 14.66 2.61 14.93 2.72 15.13L4.64 18.45C4.76 18.67 5.01 18.74 5.23 18.67L7.62 17.71C8.12 18.09 8.65 18.41 9.24 18.65L9.6 21.19C9.65 21.43 9.84 21.6 10.08 21.6H13.92C14.16 21.6 14.35 21.43 14.39 21.19L14.75 18.65C15.34 18.41 15.88 18.09 16.37 17.71L18.76 18.67C18.98 18.75 19.23 18.67 19.35 18.45L21.27 15.13C21.39 14.91 21.34 14.66 21.14 14.52L19.14 12.94ZM12 15.6C10.02 15.6 8.4 13.98 8.4 12C8.4 10.02 10.02 8.4 12 8.4C13.98 8.4 15.6 10.02 15.6 12C15.6 13.98 13.98 15.6 12 15.6Z" fill="currentColor"/>
-                    </svg>
-                </button>
-            </div>
-
-            <div class="settings" id="settings-panel">
-                <h3>系统设置</h3>
-                <div class="form-group">
-                    <label for="api-key">API Key</label>
-                    <input type="password" id="api-key" placeholder="请输入你的API Key">
-                </div>
-                <div class="form-group">
-                    <label for="model-name">模型名称 (默认: deepseek-r1)</label>
-                    <input type="text" id="model-name" placeholder="模型名称" value="deepseek-r1">
-                </div>
-                <button id="save-settings">保存设置</button>
-            </div>
-
-            <div class="chat-container" id="chat-container">
-                <div class="message bot-message">
-                    <div class="avatar">
-                        <img src="./asset/LOGO.png" alt="系统头像">
-                    </div>
-                    <div class="message-content">
-                        你好！我是海上安全预警大模型。欢迎开始咨询海上安全相关问题。你可以上传图片或视频获取分析。
-                    </div>
-                </div>
-            </div>
-
-            <div class="input-area">
-                <!-- 合并的媒体上传按钮 -->
-                <div class="media-upload-container">
-                    <button class="tool-button media-upload-button" id="media-upload-button" title="上传媒体文件">
-                        📎<span class="dropdown-arrow">▼</span>
-                        <!-- 下拉箭头 -->
-                    </button>
-                    <!-- 上传选项下拉菜单 -->
-                    <div class="media-upload-options" id="media-upload-options">
-                        <label class="upload-option">
-                            <input type="file" id="image-upload" accept="image/*" hidden>
-                            <span class="option-icon">🖼️</span> 上传图片
-                        </label>
-                        <label class="upload-option">
-                            <input type="file" id="video-upload" accept="video/*" hidden>
-                            <span class="option-icon">🎬</span> 上传视频
-                        </label>
-                    </div>
-                </div>
-
-                <!-- 紧凑的媒体预览容器 -->
-                <div id="media-previews-container"></div>
-
-                <!-- 优化宽度的输入框 -->
-                <textarea id="user-input" placeholder="请输入关于海上安全的问题..."></textarea>
-
-                <button id="send-button">发送</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 全屏预览容器 -->
-    <div class="fullscreen-overlay" id="fullscreen-overlay">
-        <div class="fullscreen-content" id="fullscreen-content">
-            <button class="close-fullscreen" id="close-fullscreen">&times;</button>
-        </div>
-    </div>
-
-    <footer class="site-footer">
-      <div class="footer-container">
-        <!-- 作者信息 -->
-        <div class="footer-left">
-          <p class="footer-title">© 2025 rainbow_yu</p>
-        </div>
-
-        <!-- 备案信息 -->
-        <div class="footer-right">
-          <p>
-            <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener">
-              ICP备案号：沪ICP备2025156088号
-            </a>
-          </p>
+  <div class="app-container">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h2><img src="asset/LOGO.png" alt="海上安全预警系统logo" class="sidebar-logo"> 海上安全预警系统</h2>
+        <button id="new-session-btn" class="btn primary-btn">
+          <i class="fas fa-plus"></i> 新建分析会话
+        </button>
+      </div>
+      <div class="history-container">
+        <h3><i class="fas fa-history"></i> 分析历史</h3>
+        <div id="history-list" class="history-list">
         </div>
       </div>
-    </footer>
+      <div class="sidebar-footer">
+        <button id="settings-btn" class="btn secondary-btn">
+          <i class="fas fa-cog"></i> 系统设置
+        </button>
+      </div>
+    </aside>
 
+    <main class="main-content">
+      <div class="chat-container" id="chat-container">
+        <div class="welcome-message">
+          <img src="asset/LOGO.png" alt="海上安全预警系统logo" class="mid-logo">
+          <h3>欢迎使用海上安全预警系统</h3>
+          <p>支持海上目标识别、风险检测、安全预警分析<br></p>
+        </div>
+      </div>
+
+      <div class="input-container">
+        <div class="media-upload">
+          <label for="media-input" class="upload-btn">
+            <i class="fas fa-paperclip"></i>
+          </label>
+          <input type="file" id="media-input" accept="image/jpeg,image/png,image/gif,video/mp4,video/webm" hidden>
+          <div id="media-preview" class="media-preview"></div>
+        </div>
+        <textarea
+          id="message-input"
+          placeholder="例如：海上安全知识科普/检测海上目标/识别风险/分析海域安全/判断船只类型"
+          rows="1"
+        ></textarea>
+        <button id="send-btn" class="btn send-btn">
+          <i class="fas fa-paper-plane"></i>
+        </button>
+      </div>
+    </main>
+  </div>
+
+  <div id="settings-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>海上安全预警系统设置</h3>
+        <button class="close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="api-key">API Key</label>
+          <input type="text" id="api-key" placeholder="输入API Key" value="sk-846a6816c1144eeea8c256c6cfc3bfb2">
+        </div>
+        <div class="form-group">
+          <label for="text-model">文本分析基座模型</label>
+          <input type="text" id="text-model" placeholder="如qwen-turbo" value="qwen-turbo">
+        </div>
+        <div class="form-group">
+          <label for="vision-model">视觉检测基座模型</label>
+          <input type="text" id="vision-model" placeholder="如qwen3-vl-plus" value="qwen3-vl-plus">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="save-settings" class="btn primary-btn">保存设置</button>
+        <button class="btn secondary-btn close-modal">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="loading-overlay" class="loading-overlay hidden">
+    <div class="loading-spinner">
+      <i class="fas fa-spinner fa-spin"></i>
+      <p>正在进行海上安全分析...</p>
+    </div>
+  </div>
+
+  <!-- 新增：页脚标签 -->
+  <footer class="sys-footer">
+    <div class="footer-left">
+      <i class="fas fa-shield-alt"></i>
+      <span></span>
+    </div>
+    <div class="footer-right">
+      <span>Copyright © rainbow_yu  | <i class="fas fa-shield-alt"></i>网站备案：<a href="https://beian.miit.gov.cn/" target="_blank">沪ICP备2025156088号</a></span>
+    </div>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.1/marked.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="scripts/intent.js"></script>
+  <script src="scripts/markdown.js"></script>
+  <script src="scripts/main.js"></script>
 </body>
 </html>
