@@ -10,7 +10,11 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // 中间件配置
-app.use(cors());
+app.use(cors({
+  origin: 'http://www.rainbowyu.com.cn', // 设置允许访问的域名（根据需要调整）
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.static(path.join(__dirname)));
 
@@ -19,7 +23,7 @@ app.use(session({
   secret: 'maritime-safety-secret-key', // 改为海上安全相关密钥
   resave: false,
   saveUninitialized: true,
-  cookie: { secure: false }
+  cookie: { secure: false } // 如果使用 HTTPS，需设置 secure: true
 }));
 
 // 初始化OpenAI客户端
