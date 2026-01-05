@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>海上安全预警大模型 | Marinova</title>
+    <!-- 引入字体：Inter (UI) 和 JetBrains Mono (代码/数据) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles/main.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.1/marked.min.js"></script>
+</head>
+<body>
+
+    <!-- 背景特效层 -->
+    <div class="bg-grid"></div>
+    <div class="bg-glow"></div>
+
+    <!-- 登录全屏遮罩 -->
+    <div id="login-overlay">
+        <div class="login-card glass-panel">
+            <div class="login-icon">
+                <i class="fas fa-anchor"></i>
+                <div class="radar-scan"></div>
+            </div>
+            <h2>Marinova AI System</h2>
+            <p class="subtitle">海上安全预警系统</p>
+            <div class="input-group">
+                <i class="fas fa-user"></i>
+                <input type="text" id="login-user" value="admin" placeholder="身份ID">
+            </div>
+            <div class="input-group">
+                <i class="fas fa-lock"></i>
+                <input type="password" id="login-pass" value="123" placeholder="访问密钥">
+            </div>
+            <button id="login-btn" class="glow-btn">
+                <span>验证身份</span> <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- 侧边栏 -->
+    <aside class="sidebar glass-panel">
+        <div class="brand">
+            <div class="logo-box"><i class="fas fa-shield-halved"></i></div>
+            <div class="brand-text">
+                <span>海上安全预警大模型</span>
+                <small>Marinova AI System</small>
+            </div>
+        </div>
+
+        <button class="new-chat-btn" id="btn-new-chat">
+            <i class="fas fa-plus"></i> 新建分析任务
+        </button>
+
+        <div class="section-title">历史会话</div>
+        <div id="session-list" class="session-list custom-scroll">
+            <!-- JS 动态生成 -->
+        </div>
+
+        <!-- 移除原来的 API Key 输入框，仅保留底部容器或留空 -->
+        <div class="sidebar-footer">
+             <!-- 原来的 input-group 这里删掉了 -->
+             <div style="font-size: 0.8rem; color: var(--text-muted); text-align: center;">
+                 2026 © rainbow_yu
+             </div>
+            <div style="font-size: 0.8rem; color: var(--text-muted); text-align: center;">
+                 沪ICP备2025156088号-1
+             </div>
+
+        </div>
+    </aside>
+
+    <!-- 主区域 -->
+    <main class="main">
+        <header class="header glass-panel">
+            <div class="header-left">
+                <div class="status-dot online"></div>
+                <div id="current-title">系统待命</div>
+            </div>
+
+            <div class="header-controls">
+                <!-- 实时模式开关 -->
+                <button id="btn-live-mode" class="live-btn">
+                    <span class="icon-box"><i class="fas fa-satellite-dish"></i></span>
+                    <span class="text">实时预警分析</span>
+                </button>
+
+                <div class="user-profile">
+                    <span id="user-display">指挥员</span>
+                    <div class="avatar-circle"><i class="fas fa-user-astronaut"></i></div>
+                </div>
+
+                <button id="btn-logout" class="icon-btn-ghost" title="退出系统">
+                    <i class="fas fa-power-off"></i>
+                </button>
+
+                <!-- 新增：设置按钮 -->
+                <button id="btn-settings" class="icon-btn-ghost" title="系统设置">
+                    <i class="fas fa-cog"></i>
+                </button>
+
+            </div>
+        </header>
+
+        <!-- 新增：设置模态框 -->
+    <div id="settings-modal" class="modal-overlay">
+        <div class="modal-card glass-panel">
+            <div class="modal-header">
+                <h3>系统配置</h3>
+                <button class="close-modal"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-item">
+                    <label>DashScope API Key</label>
+                    <div class="input-group">
+                        <i class="fas fa-key"></i>
+                        <input type="password" id="modal-api-key" placeholder="sk-affb2f48526b4aa38cadfd3004646fcc">
+                    </div>
+                    <p class="hint">配置 DashScope 服务密钥以启用大模型能力。</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="btn-save-settings" class="glow-btn">保存配置</button>
+            </div>
+        </div>
+    </div>
+
+        <!-- 1. 聊天容器 -->
+        <div id="chat-container" class="chat-box custom-scroll">
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="fas fa-radar"></i>
+                    <div class="ring"></div>
+                </div>
+                <h3>系统就绪</h3>
+                <p>请上传现场影像进行风险排查，或启动实时监控模式。</p>
+            </div>
+        </div>
+
+        <!-- 2. 实时作战容器 (HUD) -->
+        <div id="live-container" class="live-container">
+            <div class="video-wrapper">
+                <video id="live-video" autoplay playsinline muted></video>
+                <canvas id="live-canvas" style="display:none;"></canvas>
+
+                <!-- HUD 装饰线条 -->
+                <div class="hud-corner top-left"></div>
+                <div class="hud-corner top-right"></div>
+                <div class="hud-corner bottom-left"></div>
+                <div class="hud-corner bottom-right"></div>
+                <div class="scan-line"></div>
+            </div>
+
+            <div class="hud-overlay">
+                <div class="hud-top">
+                    <div class="hud-tag error"><i class="fas fa-circle"></i> LIVE FEED</div>
+                    <div class="hud-tag primary"><i class="fas fa-microchip"></i> AI ANALYSIS ACTIVE</div>
+                </div>
+
+                <div id="live-alerts" class="live-alerts">
+                    <!-- 动态警告 -->
+                </div>
+
+                <div class="hud-console glass-panel">
+                    <div class="console-header">
+                        <i class="fas fa-terminal"></i> SYSTEM LOGS
+                    </div>
+                    <div id="live-log" class="console-body custom-scroll"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 输入区 -->
+        <div class="input-area glass-panel">
+            <div id="media-preview" class="preview-box glass-panel"></div>
+
+            <div class="input-wrapper">
+                <input type="file" id="file-input" hidden accept="image/*,video/*">
+                <button class="attach-btn" onclick="document.getElementById('file-input').click()" title="上传图片/视频">
+                    <i class="fas fa-link"></i>
+                </button>
+
+                <textarea id="msg-input" rows="1" placeholder="输入指令或描述现场情况..."></textarea>
+
+                <button id="btn-send" class="send-btn">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script src="scripts/main.js"></script>
+</body>
+</html>
