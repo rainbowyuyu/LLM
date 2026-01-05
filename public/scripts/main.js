@@ -27,7 +27,12 @@ document.addEventListener('DOMContentLoaded', () => {
         settingsModal: document.getElementById('settings-modal'),
         modalApiKeyInput: document.getElementById('modal-api-key'),
         saveSettingsBtn: document.getElementById('btn-save-settings'),
-        closeModalBtn: document.querySelector('.close-modal')
+        closeModalBtn: document.querySelector('.close-modal'),
+
+        sidebar: document.getElementById('sidebar'),
+        sidebarToggle: document.getElementById('sidebar-toggle'),
+        mobileMenuBtn: document.getElementById('mobile-menu-btn'),
+        sidebarOverlay: document.getElementById('sidebar-overlay'),
     };
 
     // --- 初始化 ---
@@ -44,7 +49,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function closeSettings() {
         els.settingsModal.classList.remove('active');
     }
-    els.closeModalBtn.onclick = closeSettings;
+    if (els.closeModalBtn) els.closeModalBtn.onclick = closeSettings;
+
     // 点击遮罩关闭
     if (els.settingsModal) {
         els.settingsModal.onclick = (e) => {
@@ -100,45 +106,112 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.reload();
     };
 
-    // --- 2. 会话逻辑 ---
+    // --- 新增：侧边栏 UI 逻辑 ---
+
+    // 1. 桌面端：收缩/展开
+    if (els.sidebarToggle) {
+        els.sidebarToggle.onclick = () => {
+            els.sidebar.classList.toggle('collapsed');
+            // 调整图标方向
+            const icon = els.sidebarToggle.querySelector('i');
+            if(icon) {
+                if(els.sidebar.classList.contains('collapsed')) {
+                    icon.className = 'fas fa-chevron-right';
+                } else {
+                    icon.className = 'fas fa-chevron-left';
+                }
+            }
+        };
+    }
+
+    // 2. 移动端：打开/关闭抽屉
+    function toggleMobileMenu(show) {
+        if (show) {
+            els.sidebar.classList.add('active');
+            els.sidebarOverlay.classList.add('active');
+        } else {
+            els.sidebar.classList.remove('active');
+            els.sidebarOverlay.classList.remove('active');
+        }
+    }
+
+    if (els.mobileMenuBtn) {
+        els.mobileMenuBtn.onclick = () => toggleMobileMenu(true);
+    }
+
+    if (els.sidebarOverlay) {
+        els.sidebarOverlay.onclick = () => toggleMobileMenu(false);
+    }
+
+    // --- 2. 会话逻辑 (关键修改：适配收缩模式) ---
     async function loadSessions() {
-        const res = await fetch('/api/sessions');
-        const sessions = await res.json();
-        els.sessionList.innerHTML = '';
-        sessions.forEach(s => {
-            const div = document.createElement('div');
-            div.className = `session-item ${s.id === state.currentSessionId ? 'active' : ''}`;
-            div.innerHTML = `<i class="far fa-comments"></i> ${s.title}`;
-            div.onclick = () => switchSession(s.id);
-            els.sessionList.appendChild(div);
-        });
+        try {
+            const res = await fetch('/api/sessions');
+            const sessions = await res.json();
+
+            els.sessionList.innerHTML = '';
+            sessions.forEach(s => {
+                const div = document.createElement('div');
+                div.className = `session-item ${s.id === state.currentSessionId ? 'active' : ''}`;
+
+                // 【关键修改】添加 title 属性，当侧边栏收缩文字隐藏时，鼠标悬停显示完整标题
+                div.setAttribute('title', s.title);
+
+                // 【结构保持】图标和文字分离，以便 CSS 控制 span 的显示/隐藏
+                div.innerHTML = `<i class="far fa-comments"></i> <span>${s.title}</span>`;
+
+                div.onclick = () => {
+                    switchSession(s.id);
+                    // 移动端：点击会话后自动关闭菜单，提升体验
+                    if (window.innerWidth <= 768) {
+                        toggleMobileMenu(false);
+                    }
+                };
+                els.sessionList.appendChild(div);
+            });
+        } catch (e) {
+            console.error("加载会话失败:", e);
+        }
     }
 
     // 独立出创建会话逻辑，返回 session ID
     async function createNewSession() {
-        const res = await fetch('/api/session/new', { method: 'POST' });
-        const data = await res.json();
-        state.currentSessionId = data.id;
-        // 刷新列表
-        loadSessions();
-        // 清空当前界面
-        els.chatBox.innerHTML = `
-            <div class="empty-state">
-                <div class="empty-icon">
-                    <i class="fas fa-radar"></i>
-                    <div class="ring"></div>
-                </div>
-                <h3>系统就绪</h3>
-                <p>任务 ID: ${data.id.slice(0,8)} 已建立</p>
-            </div>`;
-        document.getElementById('current-title').textContent = "新分析任务";
-        return data.id;
+        try {
+            const res = await fetch('/api/session/new', { method: 'POST' });
+            const data = await res.json();
+            state.currentSessionId = data.id;
+
+            // 刷新列表（会自动高亮新建的会话）
+            await loadSessions();
+
+            // 移动端：新建会话后也自动关闭菜单
+            if (window.innerWidth <= 768) {
+                toggleMobileMenu(false);
+            }
+
+            // 清空当前界面
+            els.chatBox.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-radar"></i>
+                        <div class="ring"></div>
+                    </div>
+                    <h3>系统就绪</h3>
+                    <p>任务 ID: ${data.id.slice(0,8)} 已建立</p>
+                </div>`;
+            document.getElementById('current-title').textContent = "新分析任务";
+            return data.id;
+        } catch(e) {
+            console.error("创建会话失败:", e);
+        }
     }
 
     window.switchSession = async (id) => {
         state.currentSessionId = id;
         state.isLiveMode = false;
         toggleLiveUI(false);
+
+        // 刷新列表以更新高亮状态
         loadSessions();
 
         const res = await fetch(`/api/session/${id}`);
@@ -151,7 +224,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             data.messages.forEach(msg => {
                 // 历史消息：由于后端不存Base64，这里无法还原图片，只能显示标记
-                // 如果需要历史图片，后端需要接入 OSS/S3 或本地文件存储
                 appendMessage(msg.role, msg.text, msg.hasImage ? null : null, msg.hasImage);
             });
         }
@@ -250,7 +322,7 @@ document.addEventListener('DOMContentLoaded', () => {
     els.input.onkeydown = (e) => { if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }};
 
     async function sendMessage(manualText = null, manualImages = null, isLive = false) {
-        // 修复Bug: 确保 session 存在，如果是第一次，等待 createNewSession 执行完毕
+        // 确保 session 存在
         if (!state.currentSessionId && !isLive) {
             await createNewSession();
         }

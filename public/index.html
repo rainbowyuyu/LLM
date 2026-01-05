@@ -18,6 +18,9 @@
     <div class="bg-grid"></div>
     <div class="bg-glow"></div>
 
+    <!-- 移动端侧边栏遮罩 -->
+    <div id="sidebar-overlay" class="sidebar-overlay"></div>
+
     <!-- 登录全屏遮罩 -->
     <div id="login-overlay">
         <div class="login-card glass-panel">
@@ -42,34 +45,37 @@
     </div>
 
     <!-- 侧边栏 -->
-    <aside class="sidebar glass-panel">
+    <aside class="sidebar glass-panel" id="sidebar">
         <div class="brand">
             <div class="logo-box"><i class="fas fa-shield-halved"></i></div>
             <div class="brand-text">
-                <span>海上安全预警大模型</span>
-                <small>Marinova AI System</small>
+                <span>安全预警模型</span>
+                <small>Marinova AI</small>
             </div>
         </div>
 
+        <!-- 注意：给文字加个 span 以便 CSS 控制显隐 -->
         <button class="new-chat-btn" id="btn-new-chat">
-            <i class="fas fa-plus"></i> 新建分析任务
+            <i class="fas fa-plus"></i> <span>新建分析任务</span>
         </button>
 
         <div class="section-title">历史会话</div>
         <div id="session-list" class="session-list custom-scroll">
-            <!-- JS 动态生成 -->
+            <!-- JS 生成 -->
         </div>
 
-        <!-- 移除原来的 API Key 输入框，仅保留底部容器或留空 -->
         <div class="sidebar-footer">
-             <!-- 原来的 input-group 这里删掉了 -->
-             <div style="font-size: 0.8rem; color: var(--text-muted); text-align: center;">
-                 2026 © rainbow_yu
-             </div>
-            <div style="font-size: 0.8rem; color: var(--text-muted); text-align: center;">
-                 沪ICP备2025156088号-1
-             </div>
+            <!-- 新增：侧边栏收缩按钮 -->
+            <button id="sidebar-toggle" class="sidebar-toggle-btn" title="收起/展开侧边栏">
+                <i class="fas fa-chevron-left"></i>
+            </button>
 
+            <div class="footer-text" style="font-size: 0.8rem; color: var(--text-muted); text-align: center;">
+                 2026 © rainbow_yu
+            </div>
+            <div class="footer-text" style="font-size: 0.8rem; color: var(--text-muted); text-align: center;">
+                 沪ICP备2025156088号-1
+            </div>
         </div>
     </aside>
 
@@ -77,6 +83,9 @@
     <main class="main">
         <header class="header glass-panel">
             <div class="header-left">
+                <!-- 移动端汉堡菜单 -->
+                <button id="mobile-menu-btn"><i class="fas fa-bars"></i></button>
+
                 <div class="status-dot online"></div>
                 <div id="current-title">系统待命</div>
             </div>
